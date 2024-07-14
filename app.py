@@ -34,8 +34,13 @@ def get_text_chunks(text):
     return chunks
 
 def get_vectorstore(text_chunks):
-    # Use HuggingFace embeddings to avoid rate limits
-    embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
+    # Use OpenAI embeddings as a fallback if HuggingFace embeddings fail
+    try:
+        embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
+    except ValueError as e:
+        st.warning(f"HuggingFace model not available: {e}")
+        embeddings = OpenAIEmbeddings()
+    
     vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
     return vectorstore
 
