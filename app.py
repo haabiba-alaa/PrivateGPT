@@ -9,6 +9,11 @@ from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from htmlTemplates import css, bot_template, user_template
 from langchain.llms import HuggingFaceHub
+from tenacity import retry, wait_random_exponential, stop_after_attempt
+
+@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(10))
+def embed_with_retry(**kwargs):
+    return openai.Embedding.create(**kwargs)
 
 def get_pdf_text(pdf_docs):
     text = ""
@@ -29,8 +34,8 @@ def get_text_chunks(text):
     return chunks
 
 def get_vectorstore(text_chunks):
-    embeddings = OpenAIEmbeddings()
-    # embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
+    # Use HuggingFace embeddings to avoid rate limits
+    embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
     vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
     return vectorstore
 
