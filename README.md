@@ -3,9 +3,13 @@ This Streamlit web application allows users to upload multiple PDF documents, ex
 
 ## Features
 Document Upload: Users can upload multiple PDF documents.
+
 Text Extraction: Extracts text from uploaded PDF documents.
+
 Text Chunking: Splits extracted text into manageable chunks.
+
 Embedding Generation: Generates embeddings for text chunks using Hugging Face models.
+
 Conversational AI: Engages users in a chat conversation using the OpenAI API.
 
 ## Installation
