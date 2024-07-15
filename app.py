@@ -41,7 +41,7 @@ def get_vectorstore(text_chunks):
     # Set up Hugging Face embeddings
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-mpnet-base-v2",
-        api_key='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'
+        api_key=api_key
     )
     vectors = embeddings.embed_texts(text_chunks)
     
