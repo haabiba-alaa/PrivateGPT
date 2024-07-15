@@ -2,12 +2,13 @@ import streamlit as st
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.embeddings import OpenAIEmbeddings, HuggingFaceInstructEmbeddings
 from langchain.vectorstores import FAISS
-from langchain.chat_models import ChatOpenAI  # This might need to be adjusted based on Hugging Face models
+from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from htmlTemplates import css, bot_template, user_template
+from langchain.llms import HuggingFaceHub
 
 def get_pdf_text(pdf_docs):
     text = ""
@@ -16,6 +17,7 @@ def get_pdf_text(pdf_docs):
         for page in pdf_reader.pages:
             text += page.extract_text()
     return text
+
 
 def get_text_chunks(text):
     text_splitter = CharacterTextSplitter(
@@ -27,15 +29,18 @@ def get_text_chunks(text):
     chunks = text_splitter.split_text(text)
     return chunks
 
+
 def get_vectorstore(text_chunks):
-    # Use HuggingFaceEmbeddings with a specific model from the Hugging Face Model Hub
-    embeddings = HuggingFaceEmbeddings(model_name="your_huggingface_model_name_or_id")
+    embeddings = OpenAIEmbeddings()
+    # embeddings = HuggingFaceInstructEmbeddings(model_name="hkunlp/instructor-xl")
     vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
     return vectorstore
 
+
 def get_conversation_chain(vectorstore):
-    # Example using ChatOpenAI, replace with appropriate Hugging Face model
-    llm = ChatOpenAI()  # Replace with Hugging Face model setup
+    llm = ChatOpenAI()
+    # llm = HuggingFaceHub(repo_id="google/flan-t5-xxl", model_kwargs={"temperature":0.5, "max_length":512})
+
     memory = ConversationBufferMemory(
         memory_key='chat_history', return_messages=True)
     conversation_chain = ConversationalRetrievalChain.from_llm(
@@ -44,6 +49,7 @@ def get_conversation_chain(vectorstore):
         memory=memory
     )
     return conversation_chain
+
 
 def handle_userinput(user_question):
     response = st.session_state.conversation({'question': user_question})
@@ -56,6 +62,7 @@ def handle_userinput(user_question):
         else:
             st.write(bot_template.replace(
                 "{{MSG}}", message.content), unsafe_allow_html=True)
+
 
 def main():
     load_dotenv()
@@ -91,6 +98,7 @@ def main():
                 # create conversation chain
                 st.session_state.conversation = get_conversation_chain(
                     vectorstore)
+
 
 if __name__ == '__main__':
     main()
