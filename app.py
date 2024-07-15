@@ -53,7 +53,8 @@ def get_vectorstore(text_chunks):
     if embeddings is None or len(embeddings) == 0 or embeddings[0] is None:
         raise ValueError("Embeddings generation failed. Check your Hugging Face API key and embedding logic.")
     
-    vectorstore = FAISS.from_texts(texts=text_chunks, embeddings=embeddings)
+    # Assuming FAISS.from_texts() requires embeddings directly
+    vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
     return vectorstore
 
 def get_conversation_chain(vectorstore):
