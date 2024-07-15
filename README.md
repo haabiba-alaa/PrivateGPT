@@ -13,19 +13,22 @@ Clone the repository:
 
 `git clone https://github.com/your-username/your-repo.git`
 
-cd your-repo
+`cd your-repo`
 
 ## Install dependencies:
-pip install -r requirements.txt
+`pip install -r requirements.txt`
 
 ## Set up environment variables:
 Create a .env file in the root directory of the project.
 
 Add your API keys:
 
+<pre>
 OPENAI_API_KEY=your_openai_api_key_here
 
 HUGGINGFACE_API_KEY=your_huggingface_api_key_here
+</pre>
+
 
 ## Usage
 Run the Streamlit app:
