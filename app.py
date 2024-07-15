@@ -31,14 +31,16 @@ def get_text_chunks(text):
     return chunks
 
 def get_vectorstore(text_chunks):
-    # Check if text_chunks is empty
-    if not text_chunks:
-        raise ValueError("Text chunks are empty. Check your PDF extraction and splitting logic.")
+    api_key = os.getenv("OPENAI_API_KEY")
     
-    embeddings = OpenAIEmbeddings(api_key=os.getenv("OPENAI_API_KEY"))
+    if not api_key:
+        raise ValueError("OpenAI API key is missing. Please check your .env file.")
+
+    print(f"Using OpenAI API key: {api_key[:4]}...{api_key[-4:]}")  # Print first and last 4 characters of the API key for verification
+    
+    embeddings = OpenAIEmbeddings(api_key=api_key)
     vectors = embeddings.embed_texts(text_chunks)
     
-    # Check if embeddings are generated
     if not vectors or not vectors[0]:
         raise ValueError("Embeddings generation failed. Check your OpenAI API key and embedding logic.")
     
@@ -46,7 +48,12 @@ def get_vectorstore(text_chunks):
     return vectorstore
 
 def get_conversation_chain(vectorstore):
-    llm = ChatOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    api_key = os.getenv("OPENAI_API_KEY")
+    
+    if not api_key:
+        raise ValueError("OpenAI API key is missing. Please check your .env file.")
+    
+    llm = ChatOpenAI(api_key=api_key)
     memory = ConversationBufferMemory(
         memory_key='chat_history', return_messages=True)
     conversation_chain = ConversationalRetrievalChain.from_llm(
@@ -92,14 +99,12 @@ def main():
             with st.spinner("Processing"):
                 raw_text = get_pdf_text(pdf_docs)
                 
-                # Check if raw_text is empty
                 if not raw_text:
                     st.error("Failed to extract text from PDFs. Please check the PDFs and try again.")
                     return
                 
                 text_chunks = get_text_chunks(raw_text)
                 
-                # Check if text_chunks is empty
                 if not text_chunks:
                     st.error("Failed to split text into chunks. Please check the splitting logic and try again.")
                     return
