@@ -11,7 +11,7 @@ Conversational AI: Engages users in a chat conversation using the OpenAI API.
 ## Installation
 Clone the repository:
 
-git clone https://github.com/your-username/your-repo.git
+`git clone https://github.com/your-username/your-repo.git`
 
 cd your-repo
 
