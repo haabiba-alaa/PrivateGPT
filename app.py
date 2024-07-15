@@ -3,7 +3,7 @@ import streamlit as st
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
@@ -31,18 +31,18 @@ def get_text_chunks(text):
     return chunks
 
 def get_vectorstore(text_chunks):
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = os.getenv("HUGGINGFACE_API_KEY")
     
     if not api_key:
-        raise ValueError("OpenAI API key is missing. Please check your .env file.")
+        raise ValueError("Hugging Face API key is missing. Please check your .env file.")
 
-    print(f"Using OpenAI API key: {api_key[:4]}...{api_key[-4:]}")  # Print first and last 4 characters of the API key for verification
+    print(f"Using Hugging Face API key: {api_key[:4]}...{api_key[-4:]}")  # Print first and last 4 characters of the API key for verification
     
-    embeddings = OpenAIEmbeddings(api_key=api_key)
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2", api_key=api_key)
     vectors = embeddings.embed_texts(text_chunks)
     
     if not vectors or not vectors[0]:
-        raise ValueError("Embeddings generation failed. Check your OpenAI API key and embedding logic.")
+        raise ValueError("Embeddings generation failed. Check your Hugging Face API key and embedding logic.")
     
     vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
     return vectorstore
