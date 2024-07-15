@@ -9,6 +9,8 @@ from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from htmlTemplates import css, bot_template, user_template
+from sentence_transformers import SentenceTransformer
+from langchain.vectorstores import FAISS
 
 def get_pdf_text(pdf_docs):
     text = ""
@@ -30,6 +32,8 @@ def get_text_chunks(text):
     chunks = text_splitter.split_text(text)
     return chunks
 
+
+
 def get_vectorstore(text_chunks):
     load_dotenv()
     api_key = os.getenv("HUGGINGFACE_API_KEY")
@@ -39,17 +43,17 @@ def get_vectorstore(text_chunks):
     
     print(f"Using Hugging Face API key: {api_key[:4]}...{api_key[-4:]}")  # Print first and last 4 characters of the API key for verification
     
-   
-    model_path = 'sentence-transformers/all-mpnet-base-v2'
-    embeddings = HuggingFaceEmbeddings(model_name = model_path)
+    model_name = 'sentence-transformers/all-mpnet-base-v2'
+    model = SentenceTransformer(model_name)
     
-    vectors = embeddings.embed_texts(text_chunks)
+    embeddings = model.encode(text_chunks)
     
-    if not vectors or not vectors[0]:
+    if not embeddings or not embeddings[0]:
         raise ValueError("Embeddings generation failed. Check your Hugging Face API key and embedding logic.")
     
-    vectorstore = FAISS.from_texts(texts=text_chunks, embedding=embeddings)
+    vectorstore = FAISS.from_texts(texts=text_chunks, embeddings=embeddings)
     return vectorstore
+
 
 def get_conversation_chain(vectorstore):
     api_key = os.getenv("OPENAI_API_KEY")
