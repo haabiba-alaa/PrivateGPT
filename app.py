@@ -11,6 +11,8 @@ from langchain.chains import ConversationalRetrievalChain
 from htmlTemplates import css, bot_template, user_template
 from sentence_transformers import SentenceTransformer
 from langchain.vectorstores import FAISS
+from langchain.embeddings import HuggingFaceEmbeddings
+
 
 def get_pdf_text(pdf_docs):
     text = ""
