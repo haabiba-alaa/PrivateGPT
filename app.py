@@ -50,12 +50,11 @@ def get_vectorstore(text_chunks):
     
     embeddings = model.encode(text_chunks)
     
-    if not embeddings or not embeddings[0]:
+    if embeddings is None or len(embeddings) == 0 or embeddings[0] is None:
         raise ValueError("Embeddings generation failed. Check your Hugging Face API key and embedding logic.")
     
     vectorstore = FAISS.from_texts(texts=text_chunks, embeddings=embeddings)
     return vectorstore
-
 
 def get_conversation_chain(vectorstore):
     api_key = os.getenv("OPENAI_API_KEY")
