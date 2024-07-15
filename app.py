@@ -39,9 +39,10 @@ def get_vectorstore(text_chunks):
     print(f"Using Hugging Face API key: {api_key[:4]}...{api_key[-4:]}")  # Print first and last 4 characters of the API key for verification
     
     # Set up Hugging Face embeddings
-    embeddings = HuggingFaceEmbeddings()
-    embeddings.set_api_key('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')  # Set the API key separately
-    
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-mpnet-base-v2",
+        api_key='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'
+    )
     vectors = embeddings.embed_texts(text_chunks)
     
     if not vectors or not vectors[0]:
